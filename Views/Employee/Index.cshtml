@@ -1,0 +1,94 @@
+﻿@model LeasePlus_DevTest.Models.Employee
+@{
+    ViewData["Title"] = "Employee Salary Benefit Limit Calculator";
+}
+
+<h2>Employee Salary Benefit Limit Calculator</h2>
+
+<form asp-action="Index" method="post">
+    <div class="form-group">
+        <label for="CompanyType">Company Type</label>
+        <select asp-for="CompanyType" asp-items="Html.GetEnumSelectList<LeasePlus_DevTest.Models.CompanyType>()" class="form-control" id="CompanyType">
+        </select>
+        <br />
+    </div>
+
+    <div class="form-group">
+        <label for="EmploymentType">Employment Type</label>
+        <select asp-for="EmploymentType" asp-items="Html.GetEnumSelectList<LeasePlus_DevTest.Models.EmploymentType>()" class="form-control" id="EmploymentType">
+        </select>
+        <br />
+    </div>
+
+    <div class="form-group" id="IsEducated">
+        <label for="IsEducated">Is Educated</label>
+        <input asp-for="IsEducated" type="checkbox" class="form-check-input" />
+        <br /><br />
+    </div>
+
+    <div class="form-group" id="hoursWorkedField" style="display: none;">
+        <label for="HoursWorked">Hours Worked</label>
+        <input asp-for="HoursWorked" class="form-control" type="number" min="0" />
+        <br />
+    </div>
+
+    <div class="form-group">
+        <label for="Salary">Salary</label>
+        <input asp-for="Salary" class="form-control" type="number" min="0.00" step="0.01" id="Salary" name="Salary" />
+        <span asp-validation-for="Salary" class="text-danger"></span>
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-primary">Calculate Limit</button>
+</form>
+
+@if (ViewBag.CalculatedSalary != null)
+{
+    <br />
+    <h3>Calculated Benefit Limit: $@ViewBag.CalculatedSalary</h3>
+}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const companyTypeSelect = document.getElementById("CompanyType");
+        const employmentTypeSelect = document.getElementById("EmploymentType");
+        const isEducatedCheckbox = document.getElementById("IsEducated");
+
+        const hoursWorkedField = document.getElementById("hoursWorkedField");
+
+        // check if hours worked textbox should be displayed
+        function toggleHoursWorkedField() {
+            const companyType = companyTypeSelect.options[companyTypeSelect.selectedIndex].text;
+            const employmentType = employmentTypeSelect.options[employmentTypeSelect.selectedIndex].text;
+
+            // Show the Hours Worked field only if CompanyType is Corporate and EmploymentType is PartTime
+            if (companyType === "Corporate" && employmentType === "PartTime") {
+                hoursWorkedField.style.display = "block";
+            } else {
+                hoursWorkedField.style.display = "none";
+            }
+
+        }
+
+        // check if educated checkbox should be displayed
+        function toggleIsEducated() {
+            const companyType = companyTypeSelect.options[companyTypeSelect.selectedIndex].text;
+            if (companyType !== "Corporate") {
+                isEducatedCheckbox.style.display = "block";
+            } else {
+                isEducatedCheckbox.style.display = "none";
+            }
+        }
+
+        toggleHoursWorkedField();
+        toggleIsEducated();
+
+        // Add event listeners to check for changes
+        companyTypeSelect.addEventListener("change", toggleHoursWorkedField);
+        employmentTypeSelect.addEventListener("change", toggleHoursWorkedField);
+
+        companyTypeSelect.addEventListener("change", toggleIsEducated);
+        employmentTypeSelect.addEventListener("change", toggleIsEducated);
+
+    });
+</script>
